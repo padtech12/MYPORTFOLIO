@@ -2,11 +2,11 @@
 
 /* Enhanced Brand Colors & Variables */
 :root {
-  --blue: #1D4ED8;
+  --blue: #2f5cd8;
   --blue-black: #0B1220;
   --white: #FFFFFF;
   --accent: #60A5FA;
-  --gradient-primary: linear-gradient(135deg, #1D4ED8 0%, #60A5FA 100%);
+  --gradient-primary: linear-gradient(135deg, #1D4ED8 0%, #1466cb 100%);
   --gradient-dark: linear-gradient(135deg, #0B1220 0%, #1e293b 100%);
   --shadow-glow: 0 0 20px rgba(96, 165, 250, 0.3);
   --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
