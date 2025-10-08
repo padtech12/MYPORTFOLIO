@@ -37,7 +37,7 @@ class SkillAnimator {
   animateBar(bar) {
     const target = parseInt(bar.dataset.skill || 0, 10);
     const label = bar.querySelector('.skill-label');
-    const duration = 2000;
+    const duration = 600;
     const startTime = performance.now();
 
     const tick = (now) => {
@@ -49,12 +49,11 @@ class SkillAnimator {
       bar.style.width = current + '%';
       if (label) label.textContent = current + '%';
 
-      // Add glow effect when animating
       if (t < 1) {
-        bar.style.boxShadow = `0 0 ${10 + current/5}px rgba(96, 165, 250, 0.5)`;
+        bar.style.boxShadow = `0 0 ${8 + current/8}px rgba(96, 165, 250, 0.6)`;
         requestAnimationFrame(tick);
       } else {
-        bar.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.3)';
+        bar.style.boxShadow = '0 0 12px rgba(96, 165, 250, 0.4)';
       }
     };
     requestAnimationFrame(tick);
@@ -67,15 +66,16 @@ class SkillAnimator {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            // Add stagger effect
             const index = Array.from(this.bars).indexOf(entry.target);
+            // Faster on mobile, slower on desktop
+            const delay = window.innerWidth <= 768 ? index * 50 : index * 80;
             setTimeout(() => {
               this.animateBar(entry.target);
-            }, index * 200);
+            }, delay);
             observer.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.5 });
+      }, { threshold: 0.3 });
       
       this.bars.forEach(bar => observer.observe(bar));
     }
@@ -354,7 +354,7 @@ class ParticleBackground {
 }
 
 // Initialize particle background (only on desktop for performance)
-if (window.innerWidth > 768 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+if (window.innerWidth > 1024 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   new ParticleBackground();
 }
 
