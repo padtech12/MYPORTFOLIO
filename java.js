@@ -26,7 +26,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // =========================
 class SkillAnimator {
   constructor() {
-    this.bars = document.querySelectorAll('#sub-skills .skill-progress');
+    this.bars = document.querySelectorAll('.skills .skill-progress');
     this.init();
   }
 
@@ -37,7 +37,7 @@ class SkillAnimator {
   animateBar(bar) {
     const target = parseInt(bar.dataset.skill || 0, 10);
     const label = bar.querySelector('.skill-label');
-    const duration = 600;
+    const duration = 1200;
     const startTime = performance.now();
 
     const tick = (now) => {
@@ -48,12 +48,13 @@ class SkillAnimator {
 
       bar.style.width = current + '%';
       if (label) label.textContent = current + '%';
+      bar.setAttribute('aria-valuenow', current);
 
       if (t < 1) {
-        bar.style.boxShadow = `0 0 ${8 + current/8}px rgba(96, 165, 250, 0.6)`;
+        bar.style.boxShadow = `0 0 ${15 + current/5}px rgba(96, 165, 250, ${0.3 + current/200})`;
         requestAnimationFrame(tick);
       } else {
-        bar.style.boxShadow = '0 0 12px rgba(96, 165, 250, 0.4)';
+        bar.style.boxShadow = '0 0 20px rgba(96, 165, 250, 0.5)';
       }
     };
     requestAnimationFrame(tick);
@@ -66,16 +67,15 @@ class SkillAnimator {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
+            // Add stagger effect
             const index = Array.from(this.bars).indexOf(entry.target);
-            // Faster on mobile, slower on desktop
-            const delay = window.innerWidth <= 768 ? index * 50 : index * 80;
             setTimeout(() => {
               this.animateBar(entry.target);
-            }, delay);
+            }, index * 80);
             observer.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.3 });
+      }, { threshold: 0.5 });
       
       this.bars.forEach(bar => observer.observe(bar));
     }
@@ -166,6 +166,45 @@ class ModalManager {
 
 // Initialize modal manager
 new ModalManager();
+
+// =========================
+// Mobile Menu Toggle
+// =========================
+class MobileMenu {
+  constructor() {
+    this.toggle = document.querySelector('.mobile-menu-toggle');
+    this.navLinks = document.querySelector('.nav-links');
+    this.init();
+  }
+
+  init() {
+    if (!this.toggle || !this.navLinks) return;
+
+    this.toggle.addEventListener('click', () => {
+      this.toggle.classList.toggle('active');
+      this.navLinks.classList.toggle('active');
+    });
+
+    // Close menu when clicking on a link
+    this.navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        this.toggle.classList.remove('active');
+        this.navLinks.classList.remove('active');
+      });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!this.toggle.contains(e.target) && !this.navLinks.contains(e.target)) {
+        this.toggle.classList.remove('active');
+        this.navLinks.classList.remove('active');
+      }
+    });
+  }
+}
+
+// Initialize mobile menu
+new MobileMenu();
 
 
 
@@ -288,16 +327,17 @@ class ParticleBackground {
   }
 
   createParticles() {
-    const particleCount = Math.floor((this.canvas.width * this.canvas.height) / 15000);
+    // Reduce particle count for better performance
+    const particleCount = Math.min(50, Math.floor((this.canvas.width * this.canvas.height) / 20000));
     
     for (let i = 0; i < particleCount; i++) {
       this.particles.push({
         x: Math.random() * this.canvas.width,
         y: Math.random() * this.canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: Math.random() * 2 + 1,
-        opacity: Math.random() * 0.5 + 0.2
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        size: Math.random() * 1.5 + 0.5,
+        opacity: Math.random() * 0.4 + 0.1
       });
     }
   }
@@ -354,7 +394,9 @@ class ParticleBackground {
 }
 
 // Initialize particle background (only on desktop for performance)
-if (window.innerWidth > 1024 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+if (window.innerWidth > 1024 && 
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+    !(/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
   new ParticleBackground();
 }
 
@@ -370,6 +412,40 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     el.removeAttribute('data-aos-delay');
   });
 }
+
+// Optimize for mobile devices
+if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+  // Disable complex animations on mobile
+  document.documentElement.style.setProperty('--transition', 'all 0.2s ease');
+  
+  // Remove heavy effects
+  const style = document.createElement('style');
+  style.textContent = `
+    .header::before,
+    .header::after,
+    .hero::before,
+    .hero-image::before {
+      display: none !important;
+    }
+    
+    .skill:hover,
+    .project-card:hover {
+      transform: none !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// Viewport height fix for mobile browsers
+function setViewportHeight() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+setViewportHeight();
+window.addEventListener('resize', setViewportHeight);
+window.addEventListener('orientationchange', setViewportHeight);
 
 console.log('🚀 Portfolio loaded successfully! Welcome to Emmanuel\'s advanced portfolio.');
 
@@ -454,6 +530,41 @@ if (typingElement) {
   });
 }
 
+// =========================
+// Contact Form Submission (Formspree)
+// =========================
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('contactForm');
+  const message = document.getElementById('formMessage');
+
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    message.textContent = "Sending...";
+    message.style.color = "white";
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (response.ok) {
+        message.textContent = "✅ Message sent successfully!";
+        message.style.color = "limegreen";
+        form.reset();
+      } else {
+        message.textContent = "❌ Something went wrong. Please try again.";
+        message.style.color = "red";
+      }
+    } catch (error) {
+      message.textContent = "⚠️ Network error. Please check your connection.";
+      message.style.color = "orange";
+    }
+  });
+});
 
 
 

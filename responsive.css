@@ -1,0 +1,135 @@
+/* Additional Responsive Fixes */
+
+/* Prevent horizontal scroll on all devices */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Container for consistent spacing */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
+/* Fix viewport units for mobile browsers */
+:root {
+  --vh: 1vh;
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .btn:hover,
+  .nav-links a:hover,
+  .project-card:hover,
+  .skill:hover {
+    transform: none !important;
+  }
+  
+  .btn:active,
+  .nav-links a:active {
+    transform: scale(0.95);
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .hero-image img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .hero-text h1 {
+    font-size: 1.8rem;
+  }
+  
+  .navbar {
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Very wide screens */
+@media (min-width: 1600px) {
+  .hero, #sub-skills, .projects, .contact {
+    max-width: 1600px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .navbar,
+  .mobile-menu-toggle,
+  #backToTop,
+  .modal,
+  canvas {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .hero, .about, #sub-skills, .projects {
+    page-break-inside: avoid;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-color: #ffffff;
+    --bg-color: #0B1220;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .btn.outline {
+    border-width: 3px;
+  }
+  
+  .nav-links a {
+    border: 1px solid transparent;
+  }
+  
+  .nav-links a:focus {
+    border-color: var(--accent);
+  }
+}
